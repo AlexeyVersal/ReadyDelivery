@@ -6040,19 +6040,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\kenni\\.nuget\\packages\\": {}
+    "C:\\Users\\ik\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Client\\BlazorApp2.Client.csproj",
+      "projectUniqueName": "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Client\\BlazorApp2.Client.csproj",
       "projectName": "BlazorApp2.Client",
-      "projectPath": "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Client\\BlazorApp2.Client.csproj",
-      "packagesPath": "C:\\Users\\kenni\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Client\\obj\\",
+      "projectPath": "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Client\\BlazorApp2.Client.csproj",
+      "packagesPath": "C:\\Users\\ik\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Client\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\kenni\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ik\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6066,8 +6066,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj": {
-              "projectPath": "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj"
+            "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj": {
+              "projectPath": "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj"
             }
           }
         }
@@ -6110,7 +6110,7 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
-            "version": "[6.0.8, 6.0.8]"
+            "version": "[6.0.9, 6.0.9]"
           }
         ],
         "frameworkReferences": {
@@ -6118,7 +6118,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj": {}
+    "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj": {
+    "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj",
+        "projectUniqueName": "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj",
         "projectName": "BlazorApp2.Shared",
-        "projectPath": "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj",
-        "packagesPath": "C:\\Users\\kenni\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kenni\\OneDrive\\Рабочий стол\\11.04.2023 Delivery\\DeliveryPart2\\BlazorApp2\\Shared\\obj\\",
+        "projectPath": "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Shared\\BlazorApp2.Shared.csproj",
+        "packagesPath": "C:\\Users\\ik\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ik\\Desktop\\APP\\ReadyDelivery\\BlazorApp2\\Shared\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\kenni\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ik\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -61,7 +61,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

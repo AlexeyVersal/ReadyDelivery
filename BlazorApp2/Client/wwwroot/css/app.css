@@ -1,4 +1,5 @@
-﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+﻿
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -78,9 +79,9 @@ a, .btn-link {
     margin-bottom: 20px;
 }
 
-.header-block .title {
-    font-size: 30px;
-}
+    .header-block .title {
+        font-size: 30px;
+    }
 
 .main-block {
     max-width: 1920px;
@@ -124,9 +125,9 @@ a, .btn-link {
     padding: 10px;
 }
 
-.tk-block-body .input-block:not(:last-child) {
-    margin-bottom: 10px
-}
+    .tk-block-body .input-block:not(:last-child) {
+        margin-bottom: 10px
+    }
 
 .input-block {
     position: relative;
@@ -165,9 +166,9 @@ a, .btn-link {
     margin-bottom: 20px;
 }
 
-.req-field .custom-input {
-    max-width: 100%;
-}
+    .req-field .custom-input {
+        max-width: 100%;
+    }
 
 .req-field-annotation {
     position: absolute;
@@ -194,15 +195,15 @@ a, .btn-link {
     margin-bottom: 20px;
 }
 
-.result-table thead td {
-    text-align: center;
-    background-color: #89e1b040;
-}
+    .result-table thead td {
+        text-align: center;
+        background-color: #89e1b040;
+    }
 
-.result-table td {
-    border: 1px solid #000;
-    text-align: center;
-}
+    .result-table td {
+        border: 1px solid #000;
+        text-align: center;
+    }
 
 .find-btn {
     max-width: 150px;
@@ -292,4 +293,20 @@ a, .btn-link {
     to {
         opacity: 0.0;
     }
+}
+
+.loading-pr {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #ececec94;
+    color: #000;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 600;
 }
