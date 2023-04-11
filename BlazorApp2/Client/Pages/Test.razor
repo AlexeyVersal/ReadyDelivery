@@ -1,0 +1,528 @@
+﻿@page "/test"
+@inject HttpClient Http
+@using BlazorApp2.Shared.Address
+@using BlazorApp2.Shared.Terminal_or_Address
+@using BlazorApp2.Shared.Addres_or_Terminal
+@using BlazorApp2.Shared.models
+@using BlazorApp2.Shared.СДЭК
+@using BlazorApp2.Shared.City
+@using Newtonsoft.Json
+
+
+<h3>Данные для расчета:</h3>
+
+<select @bind="jsonOrder.delivery.variant">
+    <option value="a">С Терминала на Терминал</option>
+    <option value="b">С Адреса на Адрес</option>
+    <option value="c">С Терминала на Адрес</option>
+    <option value="d">С Адреса на Терминал</option>
+</select>
+@if (jsonOrder.delivery.variant == "a")
+{
+    <div style="display:flex">
+        <div style="margin-right: 85px">
+            <div>Дата выполнения заказа: Формат(ГГГГ-ММ-ДД)</div>
+            <input class="form-control" type="date" style="width: 200px;" @bind="jsonOrder.delivery.derival.produceDated" format-value="yyyy-MM-dd"></input>
+            <div>Ввести название города отправителя:</div>
+            <input class="form-control" style="width: 400px;" @bind="jsonCity.q"></input>
+            <div>Терминал отправителя:</div>
+            <select @bind="jsonOrder.delivery.derival.terminalID">
+                @foreach (var item in terminals.terminals)
+                {
+                    if (item.Default == true)
+                    {
+
+                        <option value="@item.id">@item.address</option>
+
+                    }
+
+                }
+
+            </select>
+
+            <button class="btn btn-primary" @onclick="GetTerminals1">Выбрать адрес терминала</button>
+
+            <div class="form-control" style="width: 400px;" @bind="jsonOrder.delivery.derival.terminalID"></div>
+            <div>Ввести название города получателя:</div>
+            <input class="form-control" style="width: 400px;" @bind="jsonCity2.q"></input>
+            <div>Терминал получателя:</div>
+            <select @bind="jsonOrder.delivery.arrival.terminalID">
+                @foreach (var item in terminals2.terminals)
+                {
+                    if (item.Default == true)
+                    {
+                        <option value="@item.id">@item.address</option>
+                    }
+
+                }
+
+            </select>
+
+            <button class="btn btn-primary" @onclick="GetTerminals2">Выбрать адрес терминала</button>
+
+
+            <div class="form-control" style="width: 400px;" @bind="jsonOrder.delivery.arrival.terminalID"></div>
+            <div>Длина самого длинного грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonOrder.cargo.length"></input>
+            <div>Ширина самого широкого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonOrder.cargo.width"></input>
+            <div>Высота самого высокого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonOrder.cargo.height"></input>
+            <div>Общий вес груза (кг):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonOrder.cargo.totalWeight"></input>
+
+            @if (jsonOrder.cargo.length >= 3 || jsonOrder.cargo.height >= 3 || jsonOrder.cargo.width >= 3 || jsonOrder.cargo.totalWeight >= 100)
+            {
+                <div>Вес негабаритных грузовых мест (кг):</div>
+                <input class="form-control" style="width: 100px;" @bind="jsonOrder.cargo.oversizedWeight"></input>
+                <div>Объем негабаритных грузовых мест (м3):</div>
+                <input class="form-control" style="width: 100px;" @bind="jsonOrder.cargo.oversizedVolume"></input>
+            }
+            else
+            {
+                jsonOrder.cargo.oversizedWeight = 0;
+                jsonOrder.cargo.oversizedVolume = 0;
+            }
+
+
+            <button class="btn btn-primary" @onclick="GetDeliveryData">Инфомрация о стоимости и сроках</button>
+        </div>
+        <div>
+            <h3>Полученные данные:</h3>
+
+            <h4>Деловые Линии</h4>
+
+            <div>Стоимость доставки: @responseDeliveryDatas.data.price рублей</div>
+            <div>Общая стоимость страхования груза(Входит в стоимость доставки): @responseDeliveryDatas.data.insurance</div>
+            <div>Дата прибытия на терминал отправителя: @responseDeliveryDatas.data.orderDates.arrivalToOspSender.</div>
+            <div>Дата отправки с терминала отправителя: @responseDeliveryDatas.data.orderDates.derivalFromOspSender.</div>
+            <div>Дата прибытия на терминал получателя: @responseDeliveryDatas.data.orderDates.arrivalToOspReceiver.</div>
+            <hr>
+
+            @if (addres.errors != null)
+            {
+                foreach (var error in responseDeliveryDatas.errors)
+                {
+                    <div>Исправить ошибку: @error.detail</div>
+                }
+            }
+        </div>
+
+
+
+
+    </div>
+
+}
+@if (jsonOrder.delivery.variant == "b")
+{
+    <div style="display:flex">
+        <div style="margin-right: 85px">
+            <div>Дата выполнения заказа: Формат(ГГГГ-ММ-ДД)</div>
+            <input class="form-control" type="date" style="width: 200px;" @bind="jsonAddress.delivery.derival.produceDated" format-value="yyyy-MM-dd"></input>
+
+            <div>Адрес отправителя, пример ("Омск, Ленина, 5"):</div>
+            <input class="form-control" style="width: 400px;" @onchange="(e)=>ChangeAddressTo(e)"></input>
+            <div style="display:flex">
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=derivalStartTime />
+                </div>
+                <p>--</p>
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=derivalEndTime />
+                </div>
+                <div>
+                    <p>- Время забора товара</p>
+                </div>
+
+            </div>
+            <div>Адрес получателя, например ("Ростов-на-Дону, Малиновского, 25"):</div>
+            <input class="form-control" style="width: 400px;" @onchange="(s)=>ChangeAddressFor(s)"></input>
+            <div style="display:flex">
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=arivallStartTime />
+                </div>
+                <p>--</p>
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=arivallEndTime />
+                </div>
+                <div>
+                    <p>- Время забора товара</p>
+                </div>
+            </div>
+
+            <div>Длина самого длинного грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @onchange="(l)=>Length(l)"></input>
+
+            <div>Ширина самого широкого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @onchange="(w)=>Width(w)"></input>
+
+            <div>Высота самого высокого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @onchange="(h)=>Height(h)"></input>
+
+            <div>Общий вес груза (кг):</div>
+            <input class="form-control" style="width: 100px;" @onchange="(we)=>Weight(we)"></input>
+
+            @if (jsonAddress.cargo.length >= 3 || jsonAddress.cargo.height >= 3 || jsonAddress.cargo.width >= 3 || jsonAddress.cargo.totalWeight >= 100)
+            {
+                <div>Вес негабаритных грузовых мест (кг):</div>
+                <input class="form-control" style="width: 100px;" @bind="jsonAddress.cargo.oversizedWeight"></input>
+                <div>Объем негабаритных грузовых мест (м3):</div>
+                <input class="form-control" style="width: 100px;" @bind="jsonAddress.cargo.oversizedVolume"></input>
+            }
+            else
+            {
+                jsonAddress.cargo.oversizedWeight = 0;
+                jsonAddress.cargo.oversizedVolume = 0;
+            }
+            <button class="btn btn-primary" @onclick="GetAddress">Информация о стоимости</button>
+        </div>
+        <div>
+            <h4>Деловые Линии</h4>
+            <div style="display: flex">
+                <div style="max-width: 50%; width: 100%">
+
+                    <div>Стоимость доставки: @addres.data.price</div>
+                    <div>Стоимость страхования груза: @addres.data.insurance</div>
+                    <div>__________________</div>
+                    <div>Дата передачи груза на терминал отправителя: @addres.data.orderDates.pickup</div>
+                    <div>Дата отправки: @addres.data.orderDates.derivalFromOspSender</div>
+                    <div>Дата прибытия на терминал поулчателя: @addres.data.orderDates.arrivalToOspReceiver</div>
+                    <div>Дата отправки с терминала на адрес получатля: @addres.data.orderDates.derivalFromOspReceiver</div>
+
+                </div>
+                <div style="max-width: 50%; width: 100%">
+                    @if (addres.errors != null)
+                    {
+                        foreach (var error in addres.errors)
+                        {
+                            <div>Исправить ошибку: @error.detail</div>
+                        }
+                    }
+                </div>
+            </div>
+            <h4>СДЭК</h4>
+            @foreach (var sdec in jsonAceptSDEC.tariff_codes)
+            {
+                <div>Тариф доставки: @sdec.tariff_name</div>
+                <div>Сумма доставки: @sdec.delivery_sum</div>
+                <div>Максимальный срок доставки (Рабочии дни): @sdec.period_max</div>
+                <div>Минимальный срок доставки (Рабочии дни): @sdec.period_min</div>
+                <hr>
+            }
+        </div>
+    </div>
+  
+
+}
+@if (jsonOrder.delivery.variant == "c")
+{
+    <div style="display:flex">
+        <div style="margin-right: 85px">
+            <div>Дата выполнения заказа: Формат(ГГГГ-ММ-ДД)</div>
+            <input class="form-control" type="date" style="width: 200px;" @bind="jsonSending.delivery.derival.produceDated"></input>
+
+            <div>Ввести название города:</div>
+            <input class="form-control" style="width: 400px;" @bind="jsonCityTest.q"></input>
+            <div>Терминал отправителя</div>
+            <select @bind="jsonSending.delivery.derival.terminalID">
+                @foreach (var item in terminals.terminals)
+                {
+                    if (item.Default == true)
+                    {
+
+                        <option class="form-control" value="@item.id">@item.address</option>
+
+                    }
+
+                }
+            </select>
+            <button class="btn btn-primary" @onclick="GetTerminalsTest">Выбрать адрес терминала</button>
+
+            <div>Адрес получателя, например ("Ростов-на-Дону, Малиновского, 25"):</div>
+            <input class="form-control" style="width: 400px;" @bind="jsonSending.delivery.arrival.address.search"></input>
+            <div style="display:flex">
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=arivallStartTime2 />
+                </div>
+                <p>--</p>
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=arivallEndtTime2 />
+                </div>
+                <div>
+                    <p>- Время забора товара</p>
+                </div>
+            </div>
+
+            <div>Длина самого длинного грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonSending.cargo.length"></input>
+
+            <div>Ширина самого широкого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonSending.cargo.width"></input>
+
+            <div>Высота самого высокого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonSending.cargo.height"></input>
+
+            <div>Общий вес груза (кг):</div>
+            <input class="form-control" style="width: 100px;" @bind="jsonSending.cargo.totalWeight"></input>
+
+            @if (jsonSending.cargo.length >= 3 || jsonSending.cargo.height >= 3 || jsonSending.cargo.width >= 3 || jsonSending.cargo.totalWeight >= 100)
+            {
+                <div>Вес негабаритных грузовых мест (кг):</div>
+                <input class="form-control" style="width: 100px;" @bind="jsonSending.cargo.oversizedWeight"></input>
+                <div>Объем негабаритных грузовых мест (м3):</div>
+                <input class="form-control" style="width: 100px;" @bind="jsonSending.cargo.oversizedVolume"></input>
+            }
+            else
+            {
+                jsonSending.cargo.oversizedWeight = 0;
+                jsonSending.cargo.oversizedVolume = 0;
+            }
+
+            <button class="btn btn-primary" @onclick="GetTerminalOrAddress">Получиться информацию о стоимости и сроках</button>
+        </div>
+        <div>
+            <h4>Деловые Линии</h4>
+
+            <div>Стоимость доставки: @jsonAccept.data.price</div>
+            <div>Стоимость страхования груза: @jsonAccept.data.insurance</div>
+            <div>__________________</div>
+            <div>Дата передачи груза на терминал отправителя: @jsonAccept.data.orderDates.pickup</div>
+            <div>Дата отправки: @jsonAccept.data.orderDates.derivalFromOspSender</div>
+            <div>Дата прибытия на терминал поулчателя: @jsonAccept.data.orderDates.arrivalToOspReceiver</div>
+            <div>Дата отправки с терминала на адрес получатля: @jsonAccept.data.orderDates.derivalFromOspReceiver</div>
+            <hr>
+
+            @if (addres.errors != null)
+            {
+                foreach (var error in jsonAccept.errors)
+                {
+                    <div>Исправить ошибку: @error.detail</div>
+                }
+            }
+        </div>
+    </div>
+
+
+
+
+}
+@if (jsonOrder.delivery.variant == "d")
+{
+    <div style="display:flex">
+        <div style="margin-right: 85px">
+            <div>Дата выполнения заказа: Формат(ГГГГ-ММ-ДД)</div>
+            <input class="form-control" type="date" style="width: 200px;" @bind="JsonAdresss.delivery.derival.produceDated"></input>
+
+            <div>Адрес отправителя, например ("Ростов-на-Дону, Малиновского, 25"):</div>
+            <input class="form-control" style="width: 400px;" @bind="JsonAdresss.delivery.derival.address.search"></input>
+
+            <div style="display:flex">
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=derivalStartTest></input>
+                </div>
+                <p>--</p>
+                <div>
+                    <input style="width: 105px;" class="form-control" type="time" @bind=derivalEndTimeTest></input>
+                </div>
+                <p>- Время забора товара</p>
+            </div>
+
+
+            <div>Ввести название города:</div>
+            <input class="form-control" style="width: 400px;" @bind="jsonCity.q"></input>
+            <select @bind="JsonAdresss.delivery.arrival.terminalID">
+                @foreach (var item in terminals.terminals)
+                {
+                    if (item.Default == true)
+                    {
+
+                        <option class="form-control" value="@item.id">@item.address</option>
+
+                    }
+
+                }
+            </select>
+            <button class="btn btn-primary" @onclick="GetTerminals1">Выбрать адрес терминала</button>
+            <div>Длина самого длинного грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="JsonAdresss.cargo.length"></input>
+            <div>Ширина самого широкого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="JsonAdresss.cargo.width"></input>
+            <div>Высота самого высокого грузового места (м):</div>
+            <input class="form-control" style="width: 100px;" @bind="JsonAdresss.cargo.height"></input>
+            <div>Общий вес груза (кг):</div>
+            <input class="form-control" style="width: 100px;" @bind="JsonAdresss.cargo.totalWeight"></input>
+            @if (JsonAdresss.cargo.length >= 3 || JsonAdresss.cargo.height >= 3 || JsonAdresss.cargo.width >= 3 || JsonAdresss.cargo.totalWeight >= 100)
+            {
+                <div>Вес негабаритных грузовых мес (кг):</div>
+                <input class="form-control" style="width: 100px;" @bind="JsonAdresss.cargo.oversizedWeight"></input>
+                <div>Объем негабаритных грузовых мест (м3):</div>
+                <input class="form-control" style="width: 100px;" @bind="JsonAdresss.cargo.oversizedVolume"></input>
+            }
+            else
+            {
+                JsonAdresss.cargo.oversizedWeight = 0;
+                JsonAdresss.cargo.oversizedVolume = 0;
+            }
+            <button class="btn btn-primary" @onclick="GetAddresOrTerminals">Получиться информацию о стоимости и сроках</button>
+        </div>
+        <div>
+            <h4>Деловые Линии</h4>
+            <div>Стоимость доставки: @jsonAcceptAdress.data.price</div>
+            <div>Стоимость страхования груза: @jsonAcceptAdress.data.insurance</div>
+            <hr>
+            <div>Дата передачи груза на терминал отправителя: @jsonAcceptAdress.data.orderDates.pickup</div>
+            <div>Дата отправки: @jsonAcceptAdress.data.orderDates.derivalFromOspSender</div>
+            <div>Дата прибытия на терминал поулчателя: @jsonAcceptAdress.data.orderDates.arrivalToOspReceiver</div>
+            <div>Дата отправки с терминала на адрес получатля: @jsonAcceptAdress.data.orderDates.derivalFromOspReceiver</div>
+            <hr>
+            @if (addres.errors != null)
+            {
+                foreach (var error in jsonAcceptAdress.errors)
+                {
+                    <div>Исправить ошибку: @error.detail</div>
+                }
+            }
+        </div>
+    </div>
+
+
+
+}
+@code
+{
+    public DateTime SomeTime = new DateTime();
+    protected JsonAddress jsonAddress = new JsonAddress();
+    protected JsonOrders jsonOrder = new JsonOrders();
+    protected ResponseDeliveryData responseDeliveryDatas = new ResponseDeliveryData();
+    protected Addres addres = new Addres();
+   
+    protected void Length(ChangeEventArgs l)
+    {
+        jsonAddress.cargo.length = Convert.ToDouble(l.Value);
+        jsonSDEC.packages.length = Convert.ToDecimal(l.Value);
+    }
+
+    protected void Width(ChangeEventArgs w)
+    {
+        jsonAddress.cargo.width = Convert.ToDouble(w.Value);
+        jsonSDEC.packages.width = Convert.ToDecimal(w.Value);
+    }
+    protected void Height(ChangeEventArgs h)
+    {
+        jsonAddress.cargo.height = Convert.ToDouble(h.Value);
+        jsonSDEC.packages.height = Convert.ToDecimal(h.Value);
+    }
+    protected void ChangeAddressTo(ChangeEventArgs e)
+    {
+        jsonAddress.delivery.derival.address.search = e.Value.ToString();
+        jsonSDEC.from_location.address = e.Value.ToString();
+
+    }
+    protected void Weight(ChangeEventArgs we)
+    {
+        jsonAddress.cargo.totalWeight = Convert.ToDouble(we.Value);
+        jsonSDEC.packages.weight = Convert.ToDecimal(we.Value);
+
+    }
+
+    protected void ChangeAddressFor(ChangeEventArgs s)
+    {
+
+
+        jsonAddress.delivery.arrival.address.search = s.Value.ToString();
+        jsonSDEC.to_location.address = s.Value.ToString();
+    }
+
+    protected JsonSDEC jsonSDEC = new JsonSDEC();
+    protected JsonAceptSDEC jsonAceptSDEC = new JsonAceptSDEC();
+    protected TimeOnly derivalStartTime = new TimeOnly();
+    protected TimeOnly derivalEndTime = new TimeOnly();
+    protected TimeOnly arivallStartTime = new TimeOnly();
+    protected TimeOnly arivallEndTime = new TimeOnly();
+    private async Task GetAddress()
+    {
+        jsonAddress.delivery.derival.time.worktimeStart = $"{derivalStartTime.Hour}:{derivalStartTime.Minute}".ToString();
+        jsonAddress.delivery.derival.time.worktimeEnd = $"{derivalEndTime.Hour}:{derivalEndTime.Minute}".ToString();
+        jsonAddress.delivery.arrival.time.worktimeStart = $"{arivallStartTime.Hour}:{arivallStartTime.Minute}".ToString();
+        jsonAddress.delivery.arrival.time.worktimeEnd = $"{arivallEndTime.Hour}:{arivallEndTime.Minute}".ToString();
+
+        var response = await Http.PostAsJsonAsync("Deliveryadres", jsonAddress);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        addres = JsonConvert.DeserializeObject<Addres>(responseBody);
+
+        var response1 = await Http.PostAsJsonAsync("CDEK", jsonSDEC);
+        string responsew = await response1.Content.ReadAsStringAsync();
+        jsonAceptSDEC = JsonConvert.DeserializeObject<JsonAceptSDEC>(responsew);
+
+    }
+
+    private async Task GetDeliveryData()
+    {
+        var response = await Http.PostAsJsonAsync("Delivery", jsonOrder);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        responseDeliveryDatas = JsonConvert.DeserializeObject<ResponseDeliveryData>(responseBody);
+
+
+
+    }
+    protected JsonCity jsonCity = new JsonCity();
+
+
+    protected JsonTerminals jsonReady = new JsonTerminals();
+    protected Terminals terminals = new Terminals();
+
+
+    private async Task GetTerminals1()
+    {
+        var response = await Http.PostAsJsonAsync("FindTerminals", jsonCity);
+        string responseBod = await response.Content.ReadAsStringAsync();
+        terminals = JsonConvert.DeserializeObject<Terminals>(responseBod);
+        jsonOrder.delivery.derival.terminalID = terminals.terminals[0].id;
+
+    }
+    protected JsonCity jsonCityTest = new JsonCity();
+    protected JsonOrders jsonOrderTest = new JsonOrders();
+    private async Task GetTerminalsTest()
+    {
+        var response = await Http.PostAsJsonAsync("FindTerminals", jsonCityTest);
+        string responseBod = await response.Content.ReadAsStringAsync();
+        terminals = JsonConvert.DeserializeObject<Terminals>(responseBod);
+        jsonSending.delivery.derival.terminalID = terminals.terminals[0].id;
+
+    }
+    protected JsonCity2 jsonCity2 = new JsonCity2();
+    protected Terminals2 terminals2 = new Terminals2();
+    private async Task GetTerminals2()
+    {
+        var response = await Http.PostAsJsonAsync("FindTerminals", jsonCity2);
+        string responseBod = await response.Content.ReadAsStringAsync();
+        terminals2 = JsonConvert.DeserializeObject<Terminals2>(responseBod);
+        jsonOrder.delivery.arrival.terminalID = terminals2.terminals[0].id;
+    }
+    protected JsonSending jsonSending = new JsonSending();
+    protected JsonAccept jsonAccept = new JsonAccept();
+    protected TimeOnly arivallStartTime2 = new TimeOnly();
+    protected TimeOnly arivallEndtTime2 = new TimeOnly();
+    private async Task GetTerminalOrAddress()
+    {
+        jsonSending.delivery.arrival.time.worktimeStart = $"{arivallStartTime2.Hour}:{arivallStartTime2.Minute}".ToString();
+        jsonSending.delivery.arrival.time.worktimeEnd = $"{arivallEndtTime2.Hour}:{arivallEndtTime2.Minute}".ToString();
+
+        var response = await Http.PostAsJsonAsync("DeliveryAddresOrTerminal", jsonSending);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        jsonAccept = JsonConvert.DeserializeObject<JsonAccept>(responseBody);
+    }
+    protected JsonSendingAdres JsonAdresss = new JsonSendingAdres();
+    protected JsonAcceptAdress jsonAcceptAdress = new JsonAcceptAdress();
+    protected TimeOnly derivalStartTest = new TimeOnly();
+    protected TimeOnly derivalEndTimeTest = new TimeOnly();
+    private async Task GetAddresOrTerminals()
+    {
+        JsonAdresss.delivery.derival.time.worktimeStart = $"{derivalStartTest.Hour}:{derivalStartTest.Minute}".ToString();
+        JsonAdresss.delivery.derival.time.worktimeEnd = $"{derivalEndTimeTest.Hour}:{derivalEndTimeTest.Minute}".ToString();
+        var response = await Http.PostAsJsonAsync("Addres_or_Terminalss", JsonAdresss);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        jsonAcceptAdress = JsonConvert.DeserializeObject<JsonAcceptAdress>(responseBody);
+    }
+}

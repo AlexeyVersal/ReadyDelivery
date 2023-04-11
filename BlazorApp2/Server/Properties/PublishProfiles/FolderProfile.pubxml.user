@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Server\bin\Release\net6.0\publish\</_PublishTargetUrl>
+    <History>True|2023-04-10T13:47:54.4609819Z;True|2023-04-10T16:30:25.7864662+03:00;True|2023-04-10T16:15:27.9079906+03:00;True|2023-03-10T14:16:43.3707449+03:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

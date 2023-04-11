@@ -1,0 +1,24 @@
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\bin\Debug\net6.0\BlazorApp2.Shared.deps.json
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\bin\Debug\net6.0\BlazorApp2.Shared.dll
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\bin\Debug\net6.0\BlazorApp2.Shared.pdb
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.csproj.AssemblyReference.cache
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.AssemblyInfoInputs.cache
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.AssemblyInfo.cs
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.csproj.CoreCompileInputs.cache
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.dll
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\refint\BlazorApp2.Shared.dll
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.pdb
+C:\Users\ik\Desktop\1111\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\ref\BlazorApp2.Shared.dll
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\bin\Debug\net6.0\BlazorApp2.Shared.deps.json
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\bin\Debug\net6.0\BlazorApp2.Shared.dll
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\bin\Debug\net6.0\BlazorApp2.Shared.pdb
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.csproj.AssemblyReference.cache
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.AssemblyInfoInputs.cache
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.AssemblyInfo.cs
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.csproj.CoreCompileInputs.cache
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.dll
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\refint\BlazorApp2.Shared.dll
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\BlazorApp2.Shared.pdb
+C:\Users\kenni\OneDrive\Рабочий стол\11.04.2023 Delivery\DeliveryPart2\BlazorApp2\Shared\obj\Debug\net6.0\ref\BlazorApp2.Shared.dll

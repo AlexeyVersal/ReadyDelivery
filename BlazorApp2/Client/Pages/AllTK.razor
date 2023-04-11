@@ -1,0 +1,786 @@
+﻿@page "/"
+@using BlazorApp2.Shared.Magic_Trans
+@using BlazorApp2.Shared.PEC
+@using BlazorApp2.Shared.Tk_Kit
+@using BlazorApp2.Shared.СДЭК
+@using Newtonsoft.Json
+@inject HttpClient Http
+
+
+<div class="main-block">
+    <div class="row">
+        <div class="tk-block-back">
+            <div class="tk-block">
+                <div class="tk-block-title">
+                    <img src="./cdek-logo.svg" />
+                </div>
+                <div class="tk-block-body">
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город отправителя</div>
+                        <input class="custom-input" placeholder="Город отправителя" @onchange="(e)=>ChangeAddressTo(e)"></input>
+                    </div>
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город получателя</div>
+                        <input class="custom-input" placeholder="Город получателя" @onchange="(s)=>ChangeAddressFor(s)"></input>
+                    </div>
+                    <button class="btn btn-primary" @onclick="CalculatorSdec">Рассчитать только СДЭК</button>
+                </div>
+            </div>
+        </div>
+        <div class="tk-block-back">
+            <div class="tk-block">
+                <div class="tk-block-title">
+                    <img src="./mt.png" />
+                </div>
+                <div class="tk-block-body">
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город отправителя</div>
+                        <input placeholder="Город отправителя" class="custom-input" @onchange="(e)=>FindCityFrom(e)"></input>
+                        @if (magic_JsonFrom.result != null)
+                        {
+                            <select class="custom-select" @bind="requestData.from">
+                                @foreach (var nameCity in magic_JsonFrom.result)
+                                {
+                                    @if (nameCity.delivery == true)
+                                    {
+                                        <option value="@nameCity.id">@nameCity.name</option>
+                                    }
+                                }
+                            </select>
+                            @if (magic_JsonFrom.status == true && magic_JsonFrom.result.Count == 0)
+                            {
+                                <div class="select-warning">Не найден город</div>
+                            }
+                        }
+                        @*<button class="btn btn-primary" @onclick="FindCityFrom">Найти город отправителя</button>*@
+                    </div>
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город получателя</div>
+                        <input placeholder="Город получателя" class="custom-input" @onchange="(e)=>FindCityTo(e)"></input>
+                        @if (magic_JsonTo.result != null)
+                        {
+                            <select class="custom-select" @bind="requestData.to">
+                                @foreach (var nameCity in magic_JsonTo.result)
+                                {
+                                    @if (nameCity.delivery == true)
+                                    {
+                                        <option value="@nameCity.id">@nameCity.name</option>
+                                    }
+                                }
+                            </select>
+                            @if (magic_JsonTo.status == true && magic_JsonTo.result.Count == 0)
+                            {
+                                <div class="select-warning">Не найден город</div>
+                            }
+                        }
+                        @*<button class="btn btn-primary" @onclick="FindCityTo">Найти город получателя</button>*@
+                    </div>
+                    <button class="btn btn-primary" @onclick="CalculatorMagicTrans">Рассчитать только Magic Trans</button>
+                </div>
+            </div>
+        </div>
+        <div class="tk-block-back">
+            <div class="tk-block">
+                <div class="tk-block-title">
+                    <img src="./kit-logo.svg" />
+                </div>
+                <div class="tk-block-body">
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город отправителя</div>
+                        <input placeholder="Город отправителя" class="custom-input" @onchange="(e)=>FindCitySender(e)" />
+                        @if (allInfo?.cityInfo != null)
+                        {
+                            <select class="custom-select" @bind="requestTkKit.city_pickup_code">
+
+                                @foreach (var infoCity in allInfo.cityInfo)
+                                {
+                                    <option value="@infoCity.code">@infoCity.name @infoCity.type</option>
+                                }
+                            </select>
+                        }
+                        @if (allInfo.message != null)
+                        {
+                            <div class="select-warning">Ошибка в написании города: @allInfo.message.Replace("Чтобы уточнить информацию позвоните по телефону: 8 800 234-59-60", "")</div>
+                        }
+                        @* <button class="btn btn-primary" @onclick="FindCitySender">Найти город отправителя</button>*@
+                    </div>
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город получателя</div>
+                        <input placeholder="Город получателя" class="custom-input" @onchange="(e)=>FindCityRecipient(e)" />
+
+                        @if (allInfo2.cityInfo != null)
+                        {
+                            <select class="custom-select" @bind="requestTkKit.city_delivery_code">
+                                @foreach (var infoCity in allInfo2.cityInfo)
+                                {
+                                    <option value="@infoCity.code">@infoCity.name @infoCity.type</option>
+                                }
+                            </select>
+                        }
+
+                        @if (allInfo2.message != null)
+                        {
+                            <div class="select-warning">Ошибка в написании города: @allInfo2.message.Replace("Чтобы уточнить информацию позвоните по телефону: 8 800 234-59-60", "")</div>
+                        }
+                        @*<button class="btn btn-primary" @onclick="FindCityRecipient">Найти город получателя</button>*@
+                    </div>
+                    <button class="btn btn-primary" @onclick="CalculatorTkKit">Рассчитать только Tk Kit</button>
+                </div>
+            </div>
+        </div>
+        <div class="tk-block-back">
+            <div class="tk-block">
+                <div class="tk-block-title">
+                    <img src="./pec-logo.svg" />
+                </div>
+                <div class="tk-block-body">
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город отправителя</div>
+                        <input placeholder="Город отправителя" class="custom-input" @onchange="(e)=>FindCityFromPEC(e)" />
+                        @if (datasFrom.Count != 0)
+                        {
+                            <select class="custom-select" @bind="pecSearch.nameCityFrom">
+                                @foreach (var id in datasFrom)
+                                {
+                                    <option value="@id.id">@id.name</option>
+                                }
+                            </select>
+                        }
+                        else if (FalseFrom == true)
+                        {
+                            <div class="select-warning">Ошибка в написании города</div>
+                        }
+                        @* <button class="btn btn-primary" @onclick="FindCityFromPEC">Найти город отправителя</button>*@
+                    </div>
+                    <div class="input-block">
+                        <div class="input-block-annotation">Город получателя</div>
+                        <input placeholder="Город получателя" class="custom-input" @onchange="(e)=>FindCityToPEC(e)" />
+                        @if (datasTo.Count != 0)
+                        {
+                            <select class="custom-select" @bind="pecSearch.deliver_town">
+                                @foreach (var id in datasTo)
+                                {
+                                    <option value="@id.id">@id.name</option>
+                                }
+                            </select>
+                        }
+                        else if (FalseTo == true)
+                        {
+                            <div class="select-warning">Ошибка в написании города</div>
+                        }
+                        @*<button class="btn btn-primary" @onclick="FindCityToPEC">Найти город получателя</button>*@
+                    </div>
+                    <button class="btn btn-primary" @onclick="CalculatorPec">Рассчитать только Pec</button>
+                </div>
+            </div>
+        </div>
+        <div class="tk-block-back">
+            <iframe src="https://widgets.dellin.ru/calculator?derival_to_door=off&arrival_to_door=on&sized_weight=1&sized_volume=&disabled_calculation=off&insurance=1&package=1"
+                    scrolling="no"
+                    frameborder="0">
+            </iframe>
+        </div>
+    </div>
+    <div class="row">
+    </div>
+    <div class="header-block">
+        <div class="title">
+            • Масса-габаритные характеристики груза.
+        </div>
+        <h6>Звездочкой отмечены важные поля</h6>
+    </div>
+    <div class="row">
+        <div class="req-field">
+            <div class="req-field-annotation">Высота груза (см) *</div>
+            <input class="custom-input" @onchange="(h)=>WriteHeight(h)"></input>
+        </div>
+        <div class="req-field">
+            <div class="req-field-annotation">Ширина груза (см) *</div>
+            <input class="custom-input" @onchange="(w)=>WriteWidth(w)"></input>
+        </div>
+        <div class="req-field">
+            <div class="req-field-annotation">Длина груза (см) *</div>
+            <input class="custom-input" @onchange="(l)=>WriteLength(l)"></input>
+        </div>
+        <div class="req-field">
+            <div class="req-field-annotation">Вес (кг) *</div>
+            <input class="custom-input" @onchange="(we)=>WriteWeight(we)"></input>
+        </div>
+        <div class="req-field">
+            <div class="req-field-annotation">Magic Trans просит кол-во позиций *</div>
+            <input class="custom-input" @bind="requestData.count"></input>
+        </div>
+        <div class="req-field">
+            <div class="req-field-annotation">Объявленная стоимость *</div>
+            <input class="custom-input" @onchange="(strah)=>WritePriceStrah(strah)"></input>
+
+            @if (requestTkKit.declared_price >= 50000)
+            {
+                requestTkKit.confirmation_price = 1;
+            }
+            else
+            {
+                requestTkKit.confirmation_price = 0;
+            }
+        </div>
+        <button class="find-btn" @onclick="ResultCalculator">Рассчитать</button>
+    </div>
+</div>
+@if (loading)
+{
+    <div>Пожалуйста, подождите. Идет рассчет</div>
+}
+else
+{
+    <div class="header-block">
+        <div class="title">
+            • Результат расчета
+        </div>
+    </div>
+    <div>
+        <div class="result-tk">СДЭК</div>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <td>
+                        <b>Тариф доставки</b>
+                    </td>
+                    <td>
+                        <b>Сумма доставки</b>
+                    </td>
+                    <td>
+                        <b>Сумма страховки (включена в сумму доставки)</b>
+                    </td>
+                    <td>
+                        <b>Срок доставки (рабочие дни)</b>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @if (jsonAceptSDEC._error != null)
+                {
+                    <div>Ошибка: @jsonAceptSDEC._error</div>
+                }
+                @foreach (var sdec in jsonAceptSDEC.tariff_codes)
+                {
+                    @*@if (sdec.tariff_code == 139 || sdec.tariff_code == 138 || sdec.tariff_code == 137 || sdec.tariff_code == 136 || sdec.tariff_code == 231 || sdec.tariff_code == 232 || sdec.tariff_code == 233 || sdec.tariff_code == 234)
+            {*@
+                    <tr>
+                        <td>
+                            @sdec.tariff_name
+                        </td>
+                        <td>
+                            @sdec.delivery_sum
+                        </td>
+                        <td>
+                            @sdec._priceStrah
+                        </td>
+                        <td>
+                            @sdec.period_min - @sdec.period_max
+                        </td>
+                    </tr>
+                    @* }
+            else
+            {
+            @* <tr>
+            <td>
+            Нет доставок с тарифом посылка, только экспресс
+            </td>
+            </tr>
+            }*@
+                }
+            </tbody>
+        </table>
+        <div class="result-tk">Magic Trans</div>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <td>
+                        <b>Стоимость доставки</b>
+                    </td>
+                    <td>
+                        <b>Сумма страховки (включена в сумму доставки)</b>
+                    </td>
+                    <td>
+                        <b>Срок доставки (рабочие дни)</b>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @if (resultMagicTrans.result != null)
+                {
+                    <tr>
+                        <td>
+                            @resultMagicTrans.result.price
+                        </td>
+                        <td>
+                            @resultMagicTrans._sumStrah
+                        </td>
+                        <td>
+                            @resultMagicTrans.result.min - @resultMagicTrans.result.max
+                        </td>
+                    </tr>
+                }
+                @if (resultMagicTrans.error == 104)
+                {
+                    <tr>
+                        <td>
+                            Ошибка: Необходим индивидуальный расчет
+                        </td>
+                    </tr>
+                }
+                else if (resultMagicTrans.error != 0)
+                {
+                    <tr>
+                        <td>
+                            Ошибка: @resultMagicTrans.message
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="result-tk">КИТ</div>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <td>
+                        <b>
+                            Тариф
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            Сумма доставки
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            Сумма страховки (включена в сумму доставки)
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            Срок доставки (рабочие дни)
+                        </b>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @if (resultat.resultTkKits != null)
+                {
+                    @foreach (var resultat in resultat.resultTkKits)
+                    {
+                        <tr>
+                            <td>
+                                @resultat.standart.name
+                            </td>
+                            <td>
+                                @resultat.standart.cost
+                            </td>
+                            @foreach (var priceStrahKit in resultat.standart.detail)
+                            {
+                                if (priceStrahKit.name == "Возмещение страхования груза по дейст.ст")
+                                {
+                                    <td>@priceStrahKit.price</td>
+                                }
+
+                            }
+                            <td>
+                                @resultat.standart.time
+                            </td>
+                        </tr>
+                    }
+                    @if (resultat.errors != null)
+                    {
+                        @foreach (var error in resultat.errors)
+                        {
+                            <tr>
+                                <td>
+                                    Ошибка: @error
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+        <div class="result-tk">ПЭК</div>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <td>
+                        <b>Тариф</b>
+                    </td>
+                    <td>
+                        <b>Сумма доставки</b>
+                    </td>
+                    <td>
+                        <b>Сумма страховки (включена в сумму доставки)</b>
+                    </td>
+                    <td>
+                        <b>
+                            Срок доставки (рабочие дни)
+                        </b>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @if (resultPEC.error == null)
+                {
+                    <tr>
+                        <td>
+                            От отделения до отделения
+                        </td>
+                        <td>
+                            @resultPEC.sumSkladAndSklad
+                        </td>
+                        <td>
+                            @resultPEC.priceStrah
+                        </td>
+                        <td>
+                            @resultPEC.periods
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            От отделения до адреса
+                        </td>
+                        <td>
+                            @resultPEC.sumSkladandDor
+                        </td>
+                        <td>
+                            @resultPEC.priceStrah
+                        </td>
+                        <td>
+                            @resultPEC.periods
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            От адреса до адреса
+                        </td>
+                        <td>
+                            @resultPEC.sumDorAndDor
+                        </td>
+                        <td>
+                            @resultPEC.priceStrah
+                        </td>
+                        <td>
+                            @resultPEC.periods
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            От адреса до отделения
+                        </td>
+                        <td>
+                            @resultPEC.sumDorAndSklad
+                        </td>
+                        <td>
+                            @resultPEC.priceStrah
+                        </td>
+                        <td>
+                            @resultPEC.periods
+                        </td>
+                    </tr>
+                }
+                @if (resultPEC.error != null)
+                {
+                    <tr>
+                        <td>
+                            Ошибка: @resultPEC.error
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@code {
+    protected bool loading = false;
+    protected decimal insuranseDL;
+    protected decimal volumeDL;
+    protected decimal WeightDL;
+    protected async Task ResultCalculator()
+    {
+        loading = true;
+        requestData.volume = requestData.length * requestData.width * requestData.height;
+        var response = await Http.PostAsJsonAsync("CalculationMagicTrans", requestData);
+        string body = response.Content.ReadAsStringAsync().Result;
+        resultMagicTrans = JsonConvert.DeserializeObject<ResultMagicTrans>(body);
+
+        var response1 = await Http.PostAsJsonAsync("CDEK", jsonSDEC);
+        string responsew = await response1.Content.ReadAsStringAsync();
+        jsonAceptSDEC = JsonConvert.DeserializeObject<JsonAceptSDEC>(responsew);
+        if (jsonAceptSDEC.tariff_codes.Count == 0)
+            jsonAceptSDEC._error = "Не введен город";
+
+        resultat.resultTkKits = new List<ResultTkKit>();
+        requestTkKit.places.Add(places);
+        var responseKit = await Http.PostAsJsonAsync("tkKitTest/Result", requestTkKit);
+        requestTkKit.places.Remove(places);
+        string bodyKit = responseKit.Content.ReadAsStringAsync().Result;
+        try
+        {
+            resultat = JsonConvert.DeserializeObject<Result>(bodyKit);
+        }
+        catch
+        {
+
+            if(requestTkKit.city_pickup_code == null && requestTkKit.city_delivery_code == null)
+            {
+                string eerror = "Не введены города";
+                resultat.errors.Add(eerror);
+            }
+        }
+
+        var responsePEC = await Http.PostAsJsonAsync("PecCalculation", pecSearch);
+        string bodyPEC = responsePEC.Content.ReadAsStringAsync().Result;
+        resultPEC = JsonConvert.DeserializeObject<ResultPec>(bodyPEC);
+        loading = false;
+
+    }
+    protected async Task CalculatorSdec()
+    {
+        loading = true;
+        var response1 = await Http.PostAsJsonAsync("CDEK", jsonSDEC);
+        string responsew = await response1.Content.ReadAsStringAsync();
+        jsonAceptSDEC = JsonConvert.DeserializeObject<JsonAceptSDEC>(responsew);
+        if (jsonAceptSDEC.tariff_codes.Count == 0)
+            jsonAceptSDEC._error = "Не введен город";
+        loading = false;
+    }
+    protected async Task CalculatorMagicTrans()
+    {
+        loading = true;
+        requestData.volume = requestData.length * requestData.width * requestData.height;
+        var response = await Http.PostAsJsonAsync("CalculationMagicTrans", requestData);
+        string body = response.Content.ReadAsStringAsync().Result;
+        resultMagicTrans = JsonConvert.DeserializeObject<ResultMagicTrans>(body);
+        loading = false;
+    }
+    protected async Task CalculatorTkKit()
+    {
+        loading = true;
+        resultat.resultTkKits = new List<ResultTkKit>();
+        requestTkKit.places.Add(places);
+        var responseKit = await Http.PostAsJsonAsync("tkKitTest/Result", requestTkKit);
+        requestTkKit.places.Remove(places);
+        string bodyKit = responseKit.Content.ReadAsStringAsync().Result;
+        try
+        {
+            resultat = JsonConvert.DeserializeObject<Result>(bodyKit);
+        }
+        catch
+        {
+
+            if(requestTkKit.city_pickup_code == null && requestTkKit.city_delivery_code == null)
+            {
+                string eerror = "Не введены города";
+                resultat.errors.Add(eerror);
+            }
+        }
+
+        loading = false;
+    }
+    protected async Task CalculatorPec()
+    {
+        loading = true;
+        var responsePEC = await Http.PostAsJsonAsync("PecCalculation", pecSearch);
+        string bodyPEC = responsePEC.Content.ReadAsStringAsync().Result;
+        resultPEC = JsonConvert.DeserializeObject<ResultPec>(bodyPEC);
+        loading = false;
+    }
+    protected void WritePriceStrah(ChangeEventArgs strah)
+    {
+        requestTkKit.declared_price = Convert.ToInt32(strah.Value);
+        pecSearch.strah = Convert.ToInt32(strah.Value);
+        requestData.priceStrah = Convert.ToInt32(strah.Value);
+        jsonSDEC._sumStrah = Convert.ToInt32(strah.Value);
+        insuranseDL = Convert.ToInt32(strah.Value);
+
+    }
+    protected void WriteHeight(ChangeEventArgs h)
+    {
+        jsonSDEC.packages.height = Convert.ToDecimal(h.Value);
+        requestData.height = Convert.ToDecimal(h.Value);
+        places.height = Convert.ToDecimal(h.Value);
+        pecSearch.height = Convert.ToDecimal(h.Value);
+    }
+    protected void WriteWidth(ChangeEventArgs w)
+    {
+        jsonSDEC.packages.width = Convert.ToDecimal(w.Value);
+        requestData.width = Convert.ToDecimal(w.Value);
+        places.width = Convert.ToDecimal(w.Value);
+        pecSearch.width = Convert.ToDecimal(w.Value);
+    }
+    protected void WriteLength(ChangeEventArgs l)
+    {
+        jsonSDEC.packages.length = Convert.ToDecimal(l.Value);
+        requestData.length = Convert.ToDecimal(l.Value);
+        places.length = Convert.ToDecimal(l.Value);
+        pecSearch.length = Convert.ToDecimal(l.Value);
+    }
+    protected void WriteWeight(ChangeEventArgs we)
+    {
+        jsonSDEC.packages.weight = Convert.ToDecimal(we.Value);
+        requestData.weight = Convert.ToDecimal(we.Value);
+        places.weight = Convert.ToDecimal(we.Value);
+        pecSearch.weight = Convert.ToInt32(we.Value);
+
+    }
+
+    // СДЭК
+    protected JsonSDEC jsonSDEC = new JsonSDEC();
+    protected JsonAceptSDEC jsonAceptSDEC = new JsonAceptSDEC();
+    protected TimeOnly derivalStartTime = new TimeOnly();
+    protected TimeOnly derivalEndTime = new TimeOnly();
+    protected TimeOnly arivallStartTime = new TimeOnly();
+    protected TimeOnly arivallEndTime = new TimeOnly();
+    protected void ChangeAddressTo(ChangeEventArgs e)
+    {
+        jsonSDEC.from_location.address = e.Value.ToString();
+
+    }
+    protected void ChangeAddressFor(ChangeEventArgs s)
+    {
+        jsonSDEC.to_location.address = s.Value.ToString();
+    }
+
+
+    private async Task GetAddress()
+    {
+        var response1 = await Http.PostAsJsonAsync("CDEK", jsonSDEC);
+        string responsew = await response1.Content.ReadAsStringAsync();
+        jsonAceptSDEC = JsonConvert.DeserializeObject<JsonAceptSDEC>(responsew);
+
+    }
+    // Magic Trans
+    protected ResultMagicTrans resultMagicTrans = new ResultMagicTrans();
+    protected RequestData requestData = new RequestData();
+    string? froMCity;
+    string? toCity;
+    protected Magic_Json magic_JsonFrom = new Magic_Json();
+    protected async Task FindCityFrom(ChangeEventArgs e)
+    {
+
+        froMCity = e.Value.ToString();
+        if (!String.IsNullOrEmpty(froMCity))
+        {
+            if (froMCity == "Ростов" || froMCity == "ростов")
+                froMCity = "Росто";
+            var magic_Json1 = await Http.GetAsync($"CitySearch/{froMCity}");
+            string body = magic_Json1.Content.ReadAsStringAsync().Result;
+            magic_JsonFrom = JsonConvert.DeserializeObject<Magic_Json>(body);
+            if (magic_JsonFrom.result.Count > 0)
+                requestData.from = magic_JsonFrom.result[0].id;
+        }
+
+    }
+    protected Magic_Json magic_JsonTo = new Magic_Json();
+    protected async Task FindCityTo(ChangeEventArgs e)
+    {
+        toCity = e.Value.ToString();
+        if (!String.IsNullOrEmpty(toCity))
+        {
+            if (toCity == "Ростов" || toCity == "ростов")
+                toCity = "Росто";
+            var response = await Http.GetAsync($"CitySearch/{toCity}");
+            string body = response.Content.ReadAsStringAsync().Result;
+            magic_JsonTo = JsonConvert.DeserializeObject<Magic_Json>(body);
+            if (magic_JsonTo.result.Count > 0)
+                requestData.to = magic_JsonTo.result[0].id;
+        }
+    }
+    // Tk Kit
+    protected Result resultat = new Result();
+    protected List<ResultTkKit> resultTkKit = new List<ResultTkKit>();
+    protected Places places = new Places();
+    protected RequestTkKit requestTkKit = new RequestTkKit();
+    protected NameCity SenderNameCity = new NameCity();
+    protected AllInfo allInfo = new AllInfo();
+    protected List<CityInfo>? cityInfos = new List<CityInfo>();
+    protected async Task FindCitySender(ChangeEventArgs e)
+    {
+        SenderNameCity.title = e.Value.ToString();
+        if (!String.IsNullOrEmpty(SenderNameCity.title))
+        {
+            var response = await Http.PostAsJsonAsync("tkKitTest", SenderNameCity);
+            string infoCity = response.Content.ReadAsStringAsync().Result;
+            allInfo = JsonConvert.DeserializeObject<AllInfo>(infoCity);
+            if (allInfo.cityInfo.Count > 0)
+            {
+                requestTkKit.city_pickup_code = allInfo.cityInfo[0].code;
+            }
+        }
+    }
+    protected NameCity RecipientReadNameCity = new NameCity();
+    protected List<CityInfo> RecipientСitys = new List<CityInfo>();
+    protected AllInfo allInfo2 = new AllInfo();
+    protected async Task FindCityRecipient(ChangeEventArgs e)
+    {
+        RecipientReadNameCity.title = e.Value.ToString();
+        if (!String.IsNullOrEmpty(RecipientReadNameCity.title))
+        {
+            var response = await Http.PostAsJsonAsync("tkKitTest", RecipientReadNameCity);
+            string infoCity = response.Content.ReadAsStringAsync().Result;
+            allInfo2 = JsonConvert.DeserializeObject<AllInfo>(infoCity);
+            if (allInfo2.cityInfo.Count > 0)
+            {
+                requestTkKit.city_delivery_code = allInfo2.cityInfo[0].code;
+            }
+        }
+    }
+    // PEC
+    string nameCityFrom;
+    string nameCityTo;
+    protected JsonPecSearch pecSearch = new JsonPecSearch();
+    protected List<DataCity> datasFrom = new List<DataCity>();
+    protected ResultPec resultPEC = new ResultPec();
+    protected bool FalseFrom = false;
+    protected bool FalseTo = false;
+    private async Task FindCityFromPEC(ChangeEventArgs e)
+    {
+        nameCityFrom = e.Value.ToString();
+        if (!String.IsNullOrEmpty(nameCityFrom))
+        {
+            if (nameCityFrom == "Ростов")
+                nameCityFrom = "Росто";
+            var response = await Http.GetAsync($"PeKTest/{nameCityFrom}");
+            string body = response.Content.ReadAsStringAsync().Result;
+            datasFrom = JsonConvert.DeserializeObject<List<DataCity>>(body);
+
+            if (datasFrom.Count > 0)
+            {
+                pecSearch.nameCityFrom = datasFrom[0].id;
+
+            }
+            else
+            {
+                FalseFrom = true;
+            }
+        }
+    }
+    protected List<DataCity> datasTo = new List<DataCity>();
+    private async Task FindCityToPEC(ChangeEventArgs e)
+    {
+        nameCityTo = e.Value.ToString();
+        if (!String.IsNullOrEmpty(nameCityTo))
+        {
+            if (nameCityTo == "Ростов")
+                nameCityTo = "Росто";
+            var response = await Http.GetAsync($"PeKTest/{nameCityTo}");
+            string body = response.Content.ReadAsStringAsync().Result;
+            datasTo = JsonConvert.DeserializeObject<List<DataCity>>(body);
+            if (datasTo.Count > 0)
+            {
+                pecSearch.deliver_town = datasTo[0].id;
+            }
+            else
+            {
+                FalseTo = true;
+            }
+
+        }
+    }
+}

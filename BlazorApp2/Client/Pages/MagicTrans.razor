@@ -1,0 +1,126 @@
+﻿@page "/magictrans"
+@inject HttpClient Http;
+@using BlazorApp2.Shared.Magic_Trans;
+@using Newtonsoft.Json
+
+
+<h3>MagicTrans</h3>
+
+<div>
+    <h6>Город отправителя:</h6>
+    <input @bind="froMCity"></input>
+    @if (magic_JsonFrom.result != null)
+    {
+        <select @bind="requestData.from">
+            @foreach (var nameCity in magic_JsonFrom.result)
+            {
+                @if (nameCity.delivery == true)
+                {
+                    <option value="@nameCity.id">@nameCity.name</option>
+                }
+            }
+
+        </select>
+        @if (magic_JsonFrom.status == true && magic_JsonFrom.result.Count == 0)
+        {
+            <div>Не найден город</div>
+        }
+    }
+    <button class="btn btn-primary" @onclick="FindCityFrom">Найти город отправителя</button>
+    <h6>Город получателя:</h6>
+    <input @bind="toCity"></input>
+
+    @if (magic_JsonTo.result != null)
+    {
+        <select @bind="requestData.to">
+            @foreach (var nameCity in magic_JsonTo.result)
+            {
+                @if (nameCity.delivery == true)
+                {
+                    <option value="@nameCity.id">@nameCity.name</option>
+                }
+            }
+        </select>
+         @if (magic_JsonTo.status == true && magic_JsonTo.result.Count == 0)
+        {
+            <div>Не найден город</div>
+        }
+    }
+    <button class="btn btn-primary" @onclick="FindCityTo">Найти город получателя</button>
+    <div>
+        <div>Количество позиций:</div>
+        <input class="form-control" style="width: 100px;" @bind="requestData.count"></input>
+        <div>Высота позици (м):</div>
+        <input class="form-control" style="width: 100px;" @bind="requestData.height"></input>
+        <div>Ширина позици (м):</div>
+        <input class="form-control" style="width: 100px;" @bind="requestData.width"></input>
+        <div>Длина позиции (м):</div>
+        <input class="form-control" style="width: 100px;" @bind="requestData.length"></input>
+        <div>Вес одной позици (кг):</div>
+        <input class="form-control" style="width: 100px;" @bind="requestData.weight"></input>
+
+    </div>
+    <div>
+        @if (resultMagicTrans.result != null)
+        {
+            <div>Стоимость доставки: @resultMagicTrans.result.price</div>
+            <div>Минимальный срок доставки (В днях): @resultMagicTrans.result.min</div>
+            <div>Максимальный срок доставки (В днях): @resultMagicTrans.result.max</div>
+        }
+
+
+    </div>
+    <button class="btn btn-primary" @onclick="Calculation">Calculation</button>
+    @if (resultMagicTrans.error == 104)
+    {
+        <div>Ошибка: Необходим индивидуальный расчет</div>
+    }
+    else if (resultMagicTrans.error != 0)
+    {
+        <div>Ошибка: @resultMagicTrans.message</div>
+    }
+
+</div>
+
+@code
+{
+    string? froMCity;
+    string? toCity;
+    protected Magic_Json magic_JsonFrom = new Magic_Json();
+    protected async Task FindCityFrom()
+    {
+        if (froMCity == "Ростов" || froMCity == "ростов")
+            froMCity = "Росто";
+        var magic_Json1 = await Http.GetAsync($"CitySearch/{froMCity}");
+        string body = magic_Json1.Content.ReadAsStringAsync().Result;
+        magic_JsonFrom = JsonConvert.DeserializeObject<Magic_Json>(body);
+        if(magic_JsonFrom.result.Count > 0)
+        requestData.from = magic_JsonFrom.result[0].id;
+
+    }
+    protected Magic_Json magic_JsonTo = new Magic_Json();
+    protected async Task FindCityTo()
+    {
+        if (toCity == "Ростов" || toCity == "ростов")
+            toCity = "Росто";
+        var response = await Http.GetAsync($"CitySearch/{toCity}");
+        string body = response.Content.ReadAsStringAsync().Result;
+        magic_JsonTo = JsonConvert.DeserializeObject<Magic_Json>(body);
+        if (magic_JsonTo.result.Count > 0)
+        requestData.to = magic_JsonTo.result[0].id;
+
+    }
+
+    protected RequestData requestData = new RequestData();
+    protected ResultMagicTrans resultMagicTrans = new ResultMagicTrans();
+    protected async Task Calculation()
+    {
+        requestData.volume = requestData.length * requestData.width * requestData.height;
+        var response = await Http.PostAsJsonAsync("CalculationMagicTrans", requestData);
+        string body = response.Content.ReadAsStringAsync().Result;
+        resultMagicTrans = JsonConvert.DeserializeObject<ResultMagicTrans>(body);
+
+    }
+}
+
+

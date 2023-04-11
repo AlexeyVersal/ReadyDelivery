@@ -1,0 +1,123 @@
+﻿@page "/kit"
+@inject HttpClient Http;
+@using BlazorApp2.Shared.Tk_Kit;
+@using Newtonsoft.Json
+<h3>ТК Кит</h3>
+
+<div>
+
+    <div>Введите город отправителя:</div>
+    <input @bind="SenderNameCity.title" />
+    <select @bind="requestTkKit.city_pickup_code">
+        @if (allInfo?.cityInfo != null)
+        {
+            @foreach (var infoCity in allInfo.cityInfo)
+            {
+                <option value="@infoCity.code">@infoCity.name @infoCity.type</option>
+            }
+        }
+
+    </select>
+    @if (allInfo.message != null)
+    {
+        <div>Ошибка в написании города: @allInfo.message.Replace("Чтобы уточнить информацию позвоните по телефону: 8 800 234-59-60", "")</div>
+    }
+    <button class="btn btn-primary" @onclick="FindCitySender">Найти город отправителя</button>
+    <div>Введите город получателя:</div>
+    <input @bind="RecipientReadNameCity.title" />
+    <select @bind="requestTkKit.city_delivery_code">
+        @if (allInfo2.cityInfo != null)
+        {
+            @foreach (var infoCity in allInfo2.cityInfo)
+            {
+                <option value="@infoCity.code">@infoCity.name @infoCity.type</option>
+            }
+        }
+    </select>
+    @if (allInfo2.message != null)
+    {
+        <div>Ошибка в написании города: @allInfo2.message</div>
+    }
+    <button class="btn btn-primary" @onclick="FindCityRecipient">Найти город получателя</button>
+</div>
+<div>
+    <div>Объявленная стоимость груза</div>
+    <input class="form-control" style="width: 100px;" @bind="requestTkKit.declared_price"></input>
+    <div>Высота груза (м)</div>
+    <input class="form-control" style="width: 100px;" @bind="places.height"></input>
+    <div>Ширина груза (м)</div>
+    <input class="form-control" style="width: 100px;" @bind="places.width"></input>
+    <div>Длина груза (м)</div>
+    <input class="form-control" style="width: 100px;" @bind="places.length"></input>
+    <div>Кол-во мест в позиции</div>
+    <input class="form-control" style="width: 100px;" @bind="places.count_place"></input>
+    <div>Масса КГ позиции</div>
+    <input class="form-control" style="width: 100px;" @bind="places.weight"></input>
+</div>
+<button class="btn btn-primary" @onclick="Result">Результат:</button>
+<div>
+
+    @if (result.resultTkKits != null)
+    {
+        @foreach (var resultat in result.resultTkKits)
+        {
+
+            <div>Расчет доставки:</div>
+            <div>Тариф: @resultat.standart.name</div>
+            <div>Сумма: @resultat.standart.cost</div>
+            <div>Срок: @resultat.standart.time</div>
+        }
+        @if (result.errors != null)
+        {
+            @foreach (var error in result.errors)
+            {
+                <div>Ошибка: @error</div>
+            }
+        }
+    }
+</div>
+
+@code {
+    protected Places places = new Places();
+    protected RequestTkKit requestTkKit = new RequestTkKit();
+    protected NameCity SenderNameCity = new NameCity();
+    protected AllInfo allInfo = new AllInfo();
+    protected List<CityInfo>? cityInfos = new List<CityInfo>();
+    protected async Task FindCitySender()
+    {
+        var response = await Http.PostAsJsonAsync("tkKitTest", SenderNameCity);
+        string infoCity = response.Content.ReadAsStringAsync().Result;
+        allInfo = JsonConvert.DeserializeObject<AllInfo>(infoCity);
+        if (allInfo.cityInfo.Count > 0)
+        {
+            requestTkKit.city_pickup_code = allInfo.cityInfo[0].code;
+        }
+    }
+    protected NameCity RecipientReadNameCity = new NameCity();
+    protected List<CityInfo> RecipientСitys = new List<CityInfo>();
+    protected AllInfo allInfo2 = new AllInfo();
+    protected async Task FindCityRecipient()
+    {
+        var response = await Http.PostAsJsonAsync("tkKitTest", RecipientReadNameCity);
+        string infoCity = response.Content.ReadAsStringAsync().Result;
+        allInfo2 = JsonConvert.DeserializeObject<AllInfo>(infoCity);
+        if (allInfo2.cityInfo.Count > 0)
+        {
+            requestTkKit.city_delivery_code = allInfo2.cityInfo[0].code;
+        }
+    }
+    protected Result result = new Result();
+    protected List<ResultTkKit> resultTkKit = new List<ResultTkKit>();
+    protected async Task Result()
+    {
+
+        result.resultTkKits = new List<ResultTkKit>();
+        requestTkKit.places.Add(places);
+        var response = await Http.PostAsJsonAsync("tkKitTest/Result", requestTkKit);
+        requestTkKit.places.Remove(places);
+        string body = response.Content.ReadAsStringAsync().Result;
+        result = JsonConvert.DeserializeObject<Result>(body);
+
+
+    }
+}

@@ -1,0 +1,92 @@
+﻿@page "/Pec"
+@inject HttpClient Http;
+@using BlazorApp2.Shared.PEC;
+
+@using Newtonsoft.Json
+
+<h3>TkPEC</h3>
+
+<div>Город отправиткеля:</div>
+<input class="form-control" style="width: 230px;" @bind="nameCityFrom" />
+@if (datasFrom.Count != 0)
+{
+    <select @bind="pecSearch.nameCityFrom">
+        @foreach (var id in datasFrom)
+        {
+            <option value="@id.id">@id.name</option>
+        }
+    </select>
+}
+<button class="btn btn-primary" @onclick="FindCityFrom">Найти город отправителя</button>
+
+<div>Город получателя:</div>
+<input class="form-control" style="width: 230px;" @bind="nameCityTo" />
+@if (datasTo.Count != 0)
+{
+    <select @bind="pecSearch.deliver_town">
+        @foreach (var id in datasTo)
+        {
+            <option value="@id.id">@id.name</option>
+        }
+    </select>
+}
+<button class="btn btn-primary" @onclick="FindCityTo">Найти город получателя</button>
+<div>
+    <div>Высота позици (м)</div>
+    <input class="form-control" style="width: 100px;" @bind="pecSearch.height"></input>
+    <div>Ширина позици (м)</div>
+    <input class="form-control" style="width: 100px;" @bind="pecSearch.width"></input>
+    <div>Длина позици (м)</div>
+    <input class="form-control" style="width: 100px;" @bind="pecSearch.length"></input>
+    <div>Вес позици (м)</div>
+    <input class="form-control" style="width: 100px;" @bind="pecSearch.weight"></input>
+</div>
+<div>
+
+    <h5>Сумма доставки и срок:</h5>
+    <div>От отделения до отделения: @result.sumSkladAndSklad </div>
+    <div>Срок доставки: @result.periods день(ей)</div>
+    <div>От отделения до адреса: @result.sumSkladandDor </div>
+    <div>Срок доставки: @result.periods день(ей)</div>
+    <div>От адреса до адреса: @result.sumDorAndDor </div>
+    <div>Срок доставки: @result.periods день(ей)</div>
+    <div>От адреса до отделения: @result.sumSkladAndSklad</div>
+    <div>Срок доставки: @result.periods день(ей)</div>
+
+
+</div>
+<button class="btn btn-primary" @onclick="Calculation">Результат запроса</button>
+@code
+{
+    string nameCityFrom;
+    string nameCityTo;
+    protected JsonPecSearch pecSearch = new JsonPecSearch();
+    protected List<DataCity> datasFrom = new List<DataCity>();
+    private async Task FindCityFrom()
+    {
+        if (nameCityFrom == "Ростов")
+            nameCityFrom = "Росто";
+        var response = await Http.GetAsync($"PeKTest/{nameCityFrom}");
+        string body = response.Content.ReadAsStringAsync().Result;
+        datasFrom = JsonConvert.DeserializeObject<List<DataCity>>(body);
+        pecSearch.nameCityFrom = datasFrom[0].id;
+
+    }
+    protected List<DataCity> datasTo = new List<DataCity>();
+    private async Task FindCityTo()
+    {
+        if (nameCityTo == "Ростов")
+            nameCityTo = "Росто";
+        var response = await Http.GetAsync($"PeKTest/{nameCityTo}");
+        string body = response.Content.ReadAsStringAsync().Result;
+        datasTo = JsonConvert.DeserializeObject<List<DataCity>>(body);
+        pecSearch.deliver_town = datasTo[0].id;
+    }
+    protected ResultPec result = new ResultPec();
+    protected async Task Calculation()
+    {
+        var response = await Http.PostAsJsonAsync("PecCalculation", pecSearch);
+        string body = response.Content.ReadAsStringAsync().Result;
+        result = JsonConvert.DeserializeObject<ResultPec>(body);
+    }
+}
